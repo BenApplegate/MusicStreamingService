@@ -16,6 +16,7 @@ Then I plan to start with a React web interface to interact with the backend tha
 
 # Silly future ideas
  - I would love to have the option to connect the backend to a discord bot to allow for media playback with friends over discord
+ - Native desktop/mobile apps, I have found very few truly good media players for Android and I would love to make something better, however due to my area of expertise a react app is much more likely to be a successful prototype
 
 # Build Information
 
