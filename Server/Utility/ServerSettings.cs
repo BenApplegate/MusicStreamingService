@@ -23,7 +23,7 @@ public class ServerSettings
         if (!File.Exists("server.settings"))
         {
             Logger.Warning("Failed to find server settings file, creating blank template");
-            var file = File.CreateText("server.settings");
+            StreamWriter file = File.CreateText("server.settings");
             foreach (var settings in _settingsDefualts)
             {
                 file.WriteLine(settings + '=');
@@ -33,7 +33,33 @@ public class ServerSettings
             return false;
         }
         Logger.Info("Server settings found, loading data");
+
+        //Read file line by line to parse settings
+        string[] settingsContents = File.ReadAllLines("server.settings");
+        Logger.Info($"Found {settingsContents.Length} settings:");
+        foreach (var setting in settingsContents)
+        {
+            var split = setting.Split('=');
+            _settings[split[0]] = split[1];
+            Logger.Info($"Setting {split[0]} = {split[1]}");
+        }
         
         return true;
+    }
+
+    /// <summary>
+    /// Gets a setting from the stored setting values
+    /// </summary>
+    /// <param name="setting">The setting key to request</param>
+    /// <returns>Returns the found value, or null if key was not found in settings file</returns>
+    public static string? GetSetting(string setting)
+    {
+        if (!_settings.ContainsKey(setting))
+        {
+            Logger.Warning($"Requested setting key {setting} was not found in the logfile");
+            return null;
+        }
+
+        return _settings[setting];
     }
 }

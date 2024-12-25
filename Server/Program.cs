@@ -27,6 +27,8 @@ class Program
             Environment.Exit(1);
         }
         
+        Logger.Debug(ServerSettings.GetSetting("listenPort") ?? "Failed to get listenPort");
+        Logger.Debug(ServerSettings.GetSetting("testFail") ?? "Failed to get testFail");
         
         //Close logger at end of program
         Logger.Close();
