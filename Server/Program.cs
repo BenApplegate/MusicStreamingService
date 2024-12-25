@@ -19,6 +19,16 @@ class Program
         Logger.Init();
         Logger.Info("Logger system initialized");
         
+        //Load server settings
+        if (!ServerSettings.Init())
+        {
+            Logger.Warning("Please fill out server settings and then relaunch server");
+            Logger.Close();
+            Environment.Exit(1);
+        }
+        
+        Logger.Debug(ServerSettings.GetSetting("listenPort") ?? "Failed to get listenPort");
+        Logger.Debug(ServerSettings.GetSetting("testFail") ?? "Failed to get testFail");
         
         //Close logger at end of program
         Logger.Close();
