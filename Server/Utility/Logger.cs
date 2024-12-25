@@ -11,6 +11,53 @@ namespace Server.Utility;
 
 public class Logger
 {
+    private static StreamWriter? _logFile;
+    private static bool _logFailWarning = false;
+    private static bool _closed = false;
+    
+    /// <summary>
+    /// Initializes the logger including the logfile functionality
+    /// </summary>
+    public static void Init()
+    {
+        //Check if log directory exists, create it if not
+        if (!Directory.Exists("logs"))
+        {
+            Warning("It looks like this may be the first boot of the server as the logger has not been initialized before, creating logs directory");
+            Directory.CreateDirectory("logs");
+        }
+
+        string logfileName = $"{DateTime.Now:yyyy-MM-dd_HH-mm-ss}.log";
+        _logFile = File.CreateText($"logs/{logfileName}");
+        Info($"Log file created at logs/{logfileName}, logs from now on will appear in log files");
+    }
+
+    /// <summary>
+    /// Closes logger functionality and shuts down log file creation
+    /// </summary>
+    public static void Close()
+    {
+        Info("Logger shutdown initiated, future logs will not be able to make use of logfile functionality");
+        if (_logFile is not null)
+        {
+            _logFile.Flush();
+            _logFile.Close();
+            _logFile = null;
+            _closed = true;
+        }
+        Info("Log file has been flushed and close");
+    }
+
+    private static void SendMessageToLogFile(string message)
+    {
+        if (_logFile is null && !_logFailWarning && !_closed)
+        {
+            _logFailWarning = true;
+            Warning("The log file is not open and no logs will be in the log file");
+            return;
+        }
+        _logFile?.WriteLine(message);
+    }
     
     /// <summary>
     /// Prints an info log to the console and log file
@@ -25,6 +72,8 @@ public class Logger
         var method = frame?.GetMethod();
         var className = method?.DeclaringType?.Name ?? "<unknown_class>";
         var methodName = method?.Name ?? "<unknown_method>";
+        
+        SendMessageToLogFile($"[INFO] [{Thread.CurrentThread.Name}] [{className}.{methodName}()] ({now}): {message}");
         
         //Print info to console
         var oldColor = Console.ForegroundColor;
@@ -47,6 +96,8 @@ public class Logger
         var className = method?.DeclaringType?.Name ?? "<unknown_class>";
         var methodName = method?.Name ?? "<unknown_method>";
         
+        SendMessageToLogFile($"[WARN] [{Thread.CurrentThread.Name}] [{className}.{methodName}()] ({now}): {message}");
+        
         //Print info to console
         var oldColor = Console.ForegroundColor;
         Console.ForegroundColor = ConsoleColor.Yellow;
@@ -68,6 +119,8 @@ public class Logger
         var className = method?.DeclaringType?.Name ?? "<unknown_class>";
         var methodName = method?.Name ?? "<unknown_method>";
         
+        SendMessageToLogFile($"[ERROR] [{Thread.CurrentThread.Name}] [{className}.{methodName}()] ({now}): {message}");
+        
         //Print info to console
         var oldColor = Console.ForegroundColor;
         Console.ForegroundColor = ConsoleColor.Red;
@@ -88,6 +141,8 @@ public class Logger
         var method = frame?.GetMethod();
         var className = method?.DeclaringType?.Name ?? "<unknown_class>";
         var methodName = method?.Name ?? "<unknown_method>";
+        
+        SendMessageToLogFile($"[DEBUG] [{Thread.CurrentThread.Name}] [{className}.{methodName}()] ({now}): {message}");
         
         //Print info to console
         var oldColor = Console.ForegroundColor;

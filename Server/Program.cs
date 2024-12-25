@@ -14,11 +14,13 @@ class Program
 
     public static void Main(string[] args)
     {
+        //Set main thread name and initialize system logging
         Thread.CurrentThread.Name = "Main Thread";
+        Logger.Init();
+        Logger.Info("Logger system initialized");
         
-        Logger.Info("Test logger");
-        Logger.Warning("This is a warning");
-        Logger.Error("This is a test error");
-        Logger.Debug("This is a test debug message");
+        
+        //Close logger at end of program
+        Logger.Close();
     }
 }
