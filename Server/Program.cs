@@ -5,6 +5,7 @@
 //This file serves as the main entrypoint to the server,
 //it sets up logging, and setting up other initial systems essential for running the server
 
+using Server.DB;
 using Server.Utility;
 
 namespace Server;
@@ -27,8 +28,13 @@ class Program
             Environment.Exit(1);
         }
         
-        Logger.Debug(ServerSettings.GetSetting("listenPort") ?? "Failed to get listenPort");
-        Logger.Debug(ServerSettings.GetSetting("testFail") ?? "Failed to get testFail");
+        //Connect to database
+        Database.Connect();
+        
+        
+        
+        //Close Database connection
+        Database.Close();
         
         //Close logger at end of program
         Logger.Close();
